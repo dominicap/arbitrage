@@ -34,7 +34,7 @@ func GetCurrencyName(code string) string {
 }
 
 func getAPIKey() string {
-	contents, err := ioutil.ReadFile(".keys/OpenExchangeRates") // just pass the file name
+	contents, err := ioutil.ReadFile(".keys/keys")
 	if err != nil {
 		panic(err.Error())
 	}
