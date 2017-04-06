@@ -6,6 +6,14 @@ import (
 	"strings"
 )
 
+const (
+	ConvertExchangeRatesURL = "https://openexchangerates.org/api/convert/"
+	CurrenciesURL           = "https://openexchangerates.org/api/currencies.json"
+	LatestExchangeRatesURL  = "https://openexchangerates.org/api/latest.json"
+)
+
+var APIKey string = getAPIKey()
+
 func GetCurrencyCode(name string) string { return name }
 
 func GetCurrencyName(code string) string {
@@ -25,6 +33,10 @@ func GetCurrencyName(code string) string {
 	return code
 }
 
-func main() {
-	GetCurrencyName("usd")
+func getAPIKey() string {
+	contents, err := ioutil.ReadFile(".keys/OpenExchangeRates") // just pass the file name
+	if err != nil {
+		panic(err.Error())
+	}
+	return string(contents)
 }
