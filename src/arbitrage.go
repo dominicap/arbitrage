@@ -1,3 +1,4 @@
+// Package arbitrage provides an oppurtunity to exploit the foreign exchange markets.
 package arbitrage
 
 import (
@@ -6,20 +7,23 @@ import (
 	"strings"
 )
 
+// URLs used to receive information on currency and exchange rates.
 const (
 	ConvertExchangeRatesURL = "https://openexchangerates.org/api/convert/"
 	CurrenciesURL           = "https://openexchangerates.org/api/currencies.json"
 	LatestExchangeRatesURL  = "https://openexchangerates.org/api/latest.json"
 )
 
-var APIKey string = getAPIKey()
+var openExchangeRatesKey = keys()[0]
 
-func GetCurrencyCode(name string) string { return name }
+// CurrencyCode returns the 3 letter currency code for a given country name.
+func CurrencyCode(name string) string { return name }
 
-func GetCurrencyName(code string) string {
+// CurrencyName returns the country name for a given 3 letter currency code.
+func CurrencyName(code string) string {
 	code = strings.ToUpper(code)
 
-	response, err := http.Get("https://openexchangerates.org/api/currencies.json")
+	response, err := http.Get(CurrenciesURL)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -33,10 +37,10 @@ func GetCurrencyName(code string) string {
 	return code
 }
 
-func getAPIKey() string {
+func keys() []string {
 	contents, err := ioutil.ReadFile(".keys/keys")
 	if err != nil {
 		panic(err.Error())
 	}
-	return string(contents)
+	return strings.Split(string(contents), "\n")
 }
