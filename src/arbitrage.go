@@ -1,13 +1,15 @@
-// Package arbitrage provides an oppurtunity to exploit the foreign exchange markets.
+// Package arbitrage creates an opportunity to exploit the foreign exchange markets.
 package arbitrage
 
 import (
+	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
 )
 
-// URLs used to receive information on currency and exchange rates.
+// Constant URLs that provide information on currency and exchange rates.
 const (
 	ConvertExchangeRatesURL = "https://openexchangerates.org/api/convert/"
 	CurrenciesURL           = "https://openexchangerates.org/api/currencies.json"
@@ -16,13 +18,28 @@ const (
 
 var openExchangeRatesKey = keys()[0]
 
-// CurrencyCode returns the 3 letter currency code for a given country name.
-func CurrencyCode(name string) string { return name }
+// CurrencyCode returns the 3 letter currency code for a given currency name.
+func CurrencyCode(name string) string {
+	name = strings.Title(name)
+	for key, value := range CurrencyMap() {
+		if name == value {
+			return key
+		}
+	}
+	panic("Currency name not found.")
+}
 
 // CurrencyName returns the country name for a given 3 letter currency code.
 func CurrencyName(code string) string {
 	code = strings.ToUpper(code)
+	if CurrencyMap()[code] != "" {
+		return CurrencyMap()[code]
+	}
+	panic("Currency code not found")
+}
 
+// CurrencyMap returns a map that contains a 3 letter currency code and the corresponding currency name.
+func CurrencyMap() map[string]string {
 	response, err := http.Get(CurrenciesURL)
 	if err != nil {
 		panic(err.Error())
@@ -34,7 +51,10 @@ func CurrencyName(code string) string {
 		panic(err.Error())
 	}
 
-	return code
+	var curMap map[string]string
+	json.Unmarshal(body, &curMap)
+
+	return curMap
 }
 
 func keys() []string {
