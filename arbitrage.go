@@ -100,7 +100,7 @@ func check(err error) {
 }
 
 func init() {
-    var name string
+
 }
 
 func main() {
