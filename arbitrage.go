@@ -22,9 +22,8 @@ const (
 var openExchangeRatesKey = keys()[0]
 
 var (
-	code  string
-	name  string
-	value float64
+	code, name string
+	value      float64
 )
 
 var err error
@@ -61,9 +60,9 @@ func currencyMap() map[string]string {
 	return curMap
 }
 
-func table() {
+func createTable() {
 	var codes []string
-	for key, _ := range currencyMap() {
+	for key := range currencyMap() {
 		codes = append(codes, key)
 	}
 	sort.Strings(codes)
@@ -101,7 +100,7 @@ func check(err error) {
 }
 
 func init() {
-
+    var name string
 }
 
 func main() {
