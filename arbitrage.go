@@ -12,12 +12,14 @@ import (
 	"strings"
 )
 
+// Constant Open Exchange Rates base URLs for receiving latest exchange rates.
 const (
 	ConvertExchangeRatesURL = "https://openexchangerates.org/api/convert/"
 	CurrenciesURL           = "https://openexchangerates.org/api/currencies.json"
 	LatestExchangeRatesURL  = "https://openexchangerates.org/api/latest.json"
 )
 
+// LatestExchangeRate is the struct that defines the data received from Open Exchange Rates.
 type LatestExchangeRate struct {
 	disclaimer string
 	license    string
@@ -30,6 +32,7 @@ var openExchangeRatesKey = keys()[0]
 
 var err error
 
+// CurrencyCode returns the ISO code of a currency given the exact name.
 func CurrencyCode(name string) (string, error) {
 	name = strings.Title(name)
 	for key, value := range CurrencyMap() {
@@ -40,6 +43,7 @@ func CurrencyCode(name string) (string, error) {
 	return "", errors.New("currency name not found")
 }
 
+// CurrencyName returns the exact name of a currency given the ISO Code.
 func CurrencyName(code string) (string, error) {
 	code = strings.ToUpper(code)
 	if CurrencyMap()[code] != "" {
@@ -48,6 +52,7 @@ func CurrencyName(code string) (string, error) {
 	return "", errors.New("currency name not found")
 }
 
+// CurrencyMap returns a map of the name of the currency to its ISO code.
 func CurrencyMap() map[string]string {
 	response, err := http.Get(CurrenciesURL)
 	check(err)
@@ -62,6 +67,7 @@ func CurrencyMap() map[string]string {
 	return curMap
 }
 
+// CreateTable returns a JSON graph of exchange rates.
 func CreateTable() {
 	var codes []string
 	for key := range CurrencyMap() {
