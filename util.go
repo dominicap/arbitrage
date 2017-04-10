@@ -1,10 +1,10 @@
 package arbitrage
 
 import (
-    "encoding/json"
-    "errors"
+	"encoding/json"
+	"errors"
 	"io/ioutil"
-    "net/http"
+	"net/http"
 	"path"
 	"runtime"
 	"strings"
