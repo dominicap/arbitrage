@@ -67,7 +67,7 @@ func CurrencyMap() map[string]string {
 	return curMap
 }
 
-// CreateTable returns a JSON graph of exchange rates.
+// CreateTable makes a JSON graph of exchange rates and writes it to a file.
 func CreateTable() {
 	var codes []string
 	for key := range CurrencyMap() {
