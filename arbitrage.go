@@ -1,9 +1,8 @@
-package main
+package arbitrage
 
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -14,23 +13,26 @@ import (
 )
 
 const (
-	convertExchangeRatesURL = "https://openexchangerates.org/api/convert/"
-	currenciesURL           = "https://openexchangerates.org/api/currencies.json"
-	latestExchangeRatesURL  = "https://openexchangerates.org/api/latest.json"
+	ConvertExchangeRatesURL = "https://openexchangerates.org/api/convert/"
+	CurrenciesURL           = "https://openexchangerates.org/api/currencies.json"
+	LatestExchangeRatesURL  = "https://openexchangerates.org/api/latest.json"
 )
+
+type LatestExchangeRate struct {
+	disclaimer string
+	license    string
+	timestamp  int
+	base       string
+	rates      map[string]float64
+}
 
 var openExchangeRatesKey = keys()[0]
 
-var (
-	code, name string
-	value      float64
-)
-
 var err error
 
-func currencyCode(name string) (string, error) {
+func CurrencyCode(name string) (string, error) {
 	name = strings.Title(name)
-	for key, value := range currencyMap() {
+	for key, value := range CurrencyMap() {
 		if name == value {
 			return key, nil
 		}
@@ -38,16 +40,16 @@ func currencyCode(name string) (string, error) {
 	return "", errors.New("currency name not found")
 }
 
-func currencyName(code string) (string, error) {
+func CurrencyName(code string) (string, error) {
 	code = strings.ToUpper(code)
-	if currencyMap()[code] != "" {
-		return currencyMap()[code], nil
+	if CurrencyMap()[code] != "" {
+		return CurrencyMap()[code], nil
 	}
 	return "", errors.New("currency name not found")
 }
 
-func currencyMap() map[string]string {
-	response, err := http.Get(currenciesURL)
+func CurrencyMap() map[string]string {
+	response, err := http.Get(CurrenciesURL)
 	check(err)
 	defer response.Body.Close()
 
@@ -60,27 +62,39 @@ func currencyMap() map[string]string {
 	return curMap
 }
 
-func createTable() {
+func CreateTable() {
 	var codes []string
-	for key := range currencyMap() {
+	for key := range CurrencyMap() {
 		codes = append(codes, key)
 	}
 	sort.Strings(codes)
 
-	file, err := os.Create("/var/tmp/table")
+	file, err := os.Create("data/json/graph.json")
 	check(err)
 	defer file.Close()
 
+	var table map[string]map[string]float64
+
 	for _, code := range codes {
-		_, err := file.WriteString(fmt.Sprintf("%10s", code))
+		url := LatestExchangeRatesURL + "?app_id=" + openExchangeRatesKey + "&base=" + code
+
+		response, err := http.Get(url)
 		check(err)
+		defer response.Body.Close()
+
+		body, err := ioutil.ReadAll(response.Body)
+		check(err)
+
+		var data LatestExchangeRate
+		json.Unmarshal(body, &data)
+
+		table[data.base] = data.rates
 	}
 
-	file.WriteString("\n")
-	for _, code := range codes {
-		_, err := file.WriteString(code + "\n\n")
-		check(err)
-	}
+	data, err := json.Marshal(table)
+	check(err)
+
+	file.WriteString(string(data))
 }
 
 func keys() []string {
@@ -97,12 +111,4 @@ func check(err error) {
 	if err != nil {
 		panic(err.Error())
 	}
-}
-
-func init() {
-
-}
-
-func main() {
-
 }
