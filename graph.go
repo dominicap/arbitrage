@@ -4,20 +4,18 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"sort"
 )
 
-func createTable() {
-	var codes []string
-	for key := range currencyMap() {
-		codes = append(codes, key)
-	}
-	sort.Strings(codes)
+type DirectedEdge struct {
+	V      int
+	W      int
+	Weight float64
+}
 
-	file, err := os.Create("/var/temp/graph.json")
-	check(err)
-	defer file.Close()
+func createTable() map[string]map[string]float64 {
+	codes, _ := values()
+	sort.Strings(codes)
 
 	table := make(map[string]map[string]float64)
 
@@ -37,8 +35,5 @@ func createTable() {
 		table[data.Base] = data.Rates
 	}
 
-	data, err := json.Marshal(table)
-	check(err)
-
-	file.WriteString(string(data))
+	return table
 }
