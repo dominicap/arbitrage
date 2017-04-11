@@ -16,11 +16,18 @@ func Arbitrage() []string {
 
 	table := createTable()
 
+	graph := new(EdgeWeightedDigraph)
+
+	graph.V = total
+	graph.E = 0
+	
 	for i := 0; i < total; i++ {
 		for j := 0; j < total; j++ {
 			rate := table[codes[i]][codes[j]]
 			directedEdge := DirectedEdge{V: i, W: j, Weight: -math.Log(rate)}
+			graph.Adjacency = append(graph.Adjacency, directedEdge)
 		}
 	}
+
 	return nil
 }

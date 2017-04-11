@@ -14,6 +14,14 @@ type DirectedEdge struct {
 	Weight float64
 }
 
+// EdgeWeightedDigraph represents a edge-weighted digraph of vertices named 0 through V - 1.
+type EdgeWeightedDigraph struct {
+	V         int
+	E         int
+	Adjacency []DirectedEdge
+	InDegree  []int
+}
+
 func createTable() map[string]map[string]float64 {
 	codes, _ := values()
 	sort.Strings(codes)
