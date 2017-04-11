@@ -7,6 +7,7 @@ import (
 	"sort"
 )
 
+// DirectedEdge represents a directed edge from vertex to vertex along with a weight.
 type DirectedEdge struct {
 	V      int
 	W      int
