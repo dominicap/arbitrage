@@ -15,11 +15,11 @@ func createTable() {
 	}
 	sort.Strings(codes)
 
-	file, err := os.Create("data/json/graph.json")
+	file, err := os.Create("/var/temp/graph.json")
 	check(err)
 	defer file.Close()
 
-	var table map[string]map[string]float64
+	table := make(map[string]map[string]float64)
 
 	for _, code := range codes {
 		url := latestExchangeRatesURL + "?app_id=" + openExchangeRatesKey + "&base=" + code
@@ -31,10 +31,10 @@ func createTable() {
 		body, err := ioutil.ReadAll(response.Body)
 		check(err)
 
-		var data latestExchangeRate
+		var data LatestExchangeData
 		json.Unmarshal(body, &data)
 
-		table[data.base] = data.rates
+		table[data.Base] = data.Rates
 	}
 
 	data, err := json.Marshal(table)

@@ -16,12 +16,13 @@ const (
 	latestExchangeRatesURL  = "https://openexchangerates.org/api/latest.json"
 )
 
-type latestExchangeRate struct {
-	disclaimer string
-	license    string
-	timestamp  int
-	base       string
-	rates      map[string]float64
+// LatestExchangeData defines the data received from Open Exchange Rates
+type LatestExchangeData struct {
+	Disclaimer string             `json:"disclaimer"`
+	License    string             `json:"license"`
+	Timestamp  int                `json:"timestamp"`
+	Base       string             `json:"base"`
+	Rates      map[string]float64 `json:"rates"`
 }
 
 var openExchangeRatesKey = keys()[0]
@@ -58,6 +59,15 @@ func currencyMap() map[string]string {
 	json.Unmarshal(body, &curMap)
 
 	return curMap
+}
+
+func values() ([]string, []string) {
+	var codes, names []string
+	for key, value := range currencyMap() {
+		codes = append(codes, key)
+		names = append(names, value)
+	}
+	return codes, names
 }
 
 func check(err error) {
