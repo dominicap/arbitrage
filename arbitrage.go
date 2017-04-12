@@ -26,7 +26,7 @@ func Arbitrage() []string {
 		for j := 0; j < total; j++ {
 			if !(codes[i] == codes[j]) {
 				rate := table[codes[i]][codes[j]]
-				directedEdge := DirectedEdge {V: i, W: j, Weight: -math.Log(rate)}
+				directedEdge := DirectedEdge{V: i, W: j, Weight: -math.Log(rate)}
 				graph.Adjacency = append(graph.Adjacency, directedEdge)
 			}
 		}

@@ -62,7 +62,7 @@ func currencyMap() map[string]string {
 	json.Unmarshal(body, &latest)
 
 	relMap := make(map[string]string)
-	for code, _ := range latest.Rates {
+	for code := range latest.Rates {
 		relMap[code] = curMap[code]
 	}
 
