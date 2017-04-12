@@ -1,6 +1,7 @@
 package arbitrage
 
 import (
+	"fmt"
 	"math"
 	"sort"
 )
@@ -23,9 +24,11 @@ func Arbitrage() []string {
 
 	for i := 0; i < total; i++ {
 		for j := 0; j < total; j++ {
-			rate := table[codes[i]][codes[j]]
-			directedEdge := DirectedEdge{V: i, W: j, Weight: -math.Log(rate)}
-			graph.Adjacency = append(graph.Adjacency, directedEdge)
+			if !(codes[i] == codes[j]) {
+				rate := table[codes[i]][codes[j]]
+				directedEdge := DirectedEdge {V: i, W: j, Weight: -math.Log(rate)}
+				graph.Adjacency = append(graph.Adjacency, directedEdge)
+			}
 		}
 	}
 
