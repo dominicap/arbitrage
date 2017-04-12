@@ -29,7 +29,7 @@ func createTable() map[string]map[string]float64 {
 	table := make(map[string]map[string]float64)
 
 	for _, code := range codes {
-		url := latestExchangeRatesURL + "?app_id=" + openExchangeRatesKey + "&base=" + code
+		url := latestURL + "?base=" + code
 
 		response, err := http.Get(url)
 		check(err)

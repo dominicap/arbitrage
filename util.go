@@ -5,27 +5,20 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
-	"path"
-	"runtime"
 	"strings"
 )
 
 const (
-	convertExchangeRatesURL = "https://openexchangerates.org/api/convert/"
-	currenciesURL           = "https://openexchangerates.org/api/currencies.json"
-	latestExchangeRatesURL  = "https://openexchangerates.org/api/latest.json"
+	currenciesURL = "https://openexchangerates.org/api/currencies.json"
+	latestURL     = "http://api.fixer.io/latest"
 )
 
 // LatestExchangeData defines the data received from Open Exchange Rates
 type LatestExchangeData struct {
-	Disclaimer string             `json:"disclaimer"`
-	License    string             `json:"license"`
-	Timestamp  int                `json:"timestamp"`
-	Base       string             `json:"base"`
-	Rates      map[string]float64 `json:"rates"`
+	Base  string             `json:"base"`
+	Date  string             `json:"date"`
+	Rates map[string]float64 `json:"rates"`
 }
-
-var openExchangeRatesKey = keys()[0]
 
 var err error
 
@@ -55,10 +48,25 @@ func currencyMap() map[string]string {
 	body, err := ioutil.ReadAll(response.Body)
 	check(err)
 
-	var curMap map[string]string
+	curMap := make(map[string]string)
 	json.Unmarshal(body, &curMap)
 
-	return curMap
+	response, err = http.Get(latestURL)
+	check(err)
+	defer response.Body.Close()
+
+	body, err = ioutil.ReadAll(response.Body)
+	check(err)
+
+	var latest LatestExchangeData
+	json.Unmarshal(body, &latest)
+
+	relMap := make(map[string]string)
+	for code, _ := range latest.Rates {
+		relMap[code] = curMap[code]
+	}
+
+	return relMap
 }
 
 func values() ([]string, []string) {
@@ -74,14 +82,4 @@ func check(err error) {
 	if err != nil {
 		panic(err.Error())
 	}
-}
-
-func keys() []string {
-	_, fileName, _, _ := runtime.Caller(1)
-	filePath := path.Join(path.Dir(fileName), "/.keys/keys")
-
-	contents, err := ioutil.ReadFile(filePath)
-	check(err)
-
-	return strings.Split(string(contents), "\n")
 }
