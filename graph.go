@@ -17,13 +17,13 @@ type Edge struct {
 
 // Graph represents a graph of vertices named 0 through V - 1.
 type Graph struct {
-	Vertices  int
-	Edges     int
-	Adjacency []Edge
+	Vertices int
+	Edges    int
+	Edge     []Edge
 }
 
 func (graph *Graph) addEdge(edge Edge) {
-	graph.Adjacency = append(graph.Adjacency, edge)
+	graph.Edge = append(graph.Edge, edge)
 	graph.Edges++
 }
 
@@ -31,13 +31,13 @@ func (graph *Graph) addEdge(edge Edge) {
 type BellmanFord struct {
 	Graph       Graph
 	Distance    []float64
-	Predecessor []Edge
+	Predecessor []int
 }
 
 func (bellmanFord *BellmanFord) initialize(source int) {
 	for i := 0; i < bellmanFord.Graph.Vertices; i++ {
 		bellmanFord.Distance[i] = math.Inf(+1)
-		bellmanFord.Predecessor[i] = Edge{}
+		bellmanFord.Predecessor[i] = -1
 	}
 	bellmanFord.Distance[source] = 0
 }
@@ -45,12 +45,13 @@ func (bellmanFord *BellmanFord) initialize(source int) {
 func (bellmanFord *BellmanFord) relax() {
 	for i := 1; i <= bellmanFord.Graph.Vertices-1; i++ {
 		for j := 0; j < bellmanFord.Graph.Edges; j++ {
-			u := bellmanFord.Graph.Adjacency[j].Start
-			v := bellmanFord.Graph.Adjacency[j].Destination
-			weight := bellmanFord.Graph.Adjacency[j].Weight
+			u := bellmanFord.Graph.Edge[j].Start
+			v := bellmanFord.Graph.Edge[j].Destination
+			weight := bellmanFord.Graph.Edge[j].Weight
+
 			if bellmanFord.Distance[u]+weight < bellmanFord.Distance[v] {
 				bellmanFord.Distance[v] = bellmanFord.Distance[u] + weight
-				bellmanFord.Predecessor[v] = bellmanFord.Graph.Adjacency[j]
+				bellmanFord.Predecessor[v] = u
 			}
 		}
 	}
@@ -58,9 +59,9 @@ func (bellmanFord *BellmanFord) relax() {
 
 func (bellmanFord *BellmanFord) hasNegativeCycle() bool {
 	for j := 0; j < bellmanFord.Graph.Edges; j++ {
-		u := bellmanFord.Graph.Adjacency[j].Start
-		v := bellmanFord.Graph.Adjacency[j].Destination
-		weight := bellmanFord.Graph.Adjacency[j].Weight
+		u := bellmanFord.Graph.Edge[j].Start
+		v := bellmanFord.Graph.Edge[j].Destination
+		weight := bellmanFord.Graph.Edge[j].Weight
 
 		if bellmanFord.Distance[u]+weight < bellmanFord.Distance[v] {
 			return true

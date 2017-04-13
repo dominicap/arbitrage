@@ -49,13 +49,13 @@ func Arbitrage(value float64, code string) []string {
 		}
 	}
 
-	bellmanFord := BellmanFord{Graph: graph, Distance: make([]float64, graph.Vertices), Predecessor: make([]Edge, graph.Vertices)}
+	bellmanFord := BellmanFord{Graph: graph, Distance: make([]float64, graph.Vertices), Predecessor: make([]int, graph.Vertices)}
 
 	bellmanFord.initialize(source)
 	bellmanFord.relax()
 
 	if bellmanFord.hasNegativeCycle() {
-		// Retrace and get path
+		// TODO: Retrace and find shortest cycle with least weight
 	}
 
 	return nil
