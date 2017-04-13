@@ -7,6 +7,15 @@ import (
 	"sort"
 )
 
+// BellmanFord represents a data type for solving the single-source shortest paths problem in edge-weighted digraphs with no negative cycles.
+type BellmanFord struct {
+	DistanceTo []float64
+	EdgeTo     []DirectedEdge
+	OnQueue    []bool
+	Cost       int
+	Cycle      []DirectedEdge
+}
+
 // DirectedEdge represents a directed edge from vertex to vertex along with a weight.
 type DirectedEdge struct {
 	V      int
@@ -20,6 +29,10 @@ type EdgeWeightedDigraph struct {
 	E         int
 	Adjacency []DirectedEdge
 	InDegree  []int
+}
+
+func (bellmanFord BellmanFord) hasNegativeCycle() bool {
+	return bellmanFord.Cycle != nil
 }
 
 func createTable() map[string]map[string]float64 {
