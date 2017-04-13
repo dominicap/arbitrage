@@ -28,7 +28,6 @@ func Arbitrage(value float64, code string) []string {
 	}
 
 	if source == -1 {
-		fmt.Println(base)
 		panic("error: ISO code not found.")
 	}
 
@@ -36,11 +35,7 @@ func Arbitrage(value float64, code string) []string {
 
 	table := createTable()
 
-	graph := new(EdgeWeightedDigraph)
-
-	graph.V = total
-	graph.E = 0
-	graph.InDegree = make([]int, total)
+	graph := Graph{Vertices: total, Edges: 0}
 
 	for i := 0; i < total; i++ {
 		for j := 0; j < total; j++ {
@@ -50,22 +45,27 @@ func Arbitrage(value float64, code string) []string {
 			} else {
 				rate = table[codes[i]][codes[j]]
 			}
-			directedEdge := DirectedEdge{V: i, W: j, Weight: -math.Log(rate)}
-			graph.Adjacency = append(graph.Adjacency, directedEdge)
+			edge := Edge{Start: i, Destination: j, Weight: -math.Log(rate)}
+			graph.addEdge(edge)
 		}
 	}
 
-	bellmanFord := new(BellmanFord)
+	bellmanFord := BellmanFord{Graph: graph, Vertices: graph.Vertices, Edges: graph.Edges, Distances: make([]float64, graph.Vertices)}
 
-	bellmanFord.DistanceTo = make([]float64, graph.V)
-	bellmanFord.EdgeTo = make([]DirectedEdge, graph.V)
-	bellmanFord.OnQueue = make([]bool, graph.V)
-
-	for i := 0; i < graph.V; i++ {
-		bellmanFord.DistanceTo[i] = math.Inf(+1)
+	for i := 0; i < bellmanFord.Vertices; i++ {
+		bellmanFord.Distances[i] = math.Inf(+1)
 	}
 
-	bellmanFord.DistanceTo[source] = 0.0
+	bellmanFord.Distances[source] = 0
+
+	bellmanFord.relax()
+
+	if bellmanFord.hasNegativeCycle() {
+		for i := 0; i < len(bellmanFord.Cycle); i++ {
+			rate := table[codes[bellmanFord.Cycle[i].Start]][codes[bellmanFord.Cycle[i].Destination]]
+			fmt.Println(codes[bellmanFord.Cycle[i].Start], codes[bellmanFord.Cycle[i].Destination], rate)
+		}
+	}
 
 	return nil
 }
