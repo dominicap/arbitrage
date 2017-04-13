@@ -48,10 +48,9 @@ func (bellmanFord *BellmanFord) relax() {
 			u := bellmanFord.Graph.Adjacency[j].Start
 			v := bellmanFord.Graph.Adjacency[j].Destination
 			weight := bellmanFord.Graph.Adjacency[j].Weight
-
 			if bellmanFord.Distance[u]+weight < bellmanFord.Distance[v] {
 				bellmanFord.Distance[v] = bellmanFord.Distance[u] + weight
-				bellmanFord.Predecessor[v] = bellmanFord.Adjacency[j]
+				bellmanFord.Predecessor[v] = bellmanFord.Graph.Adjacency[j]
 			}
 		}
 	}

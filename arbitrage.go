@@ -1,7 +1,6 @@
 package arbitrage
 
 import (
-	"fmt"
 	"math"
 	"sort"
 	"strings"
