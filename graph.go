@@ -3,6 +3,7 @@ package arbitrage
 import (
 	"encoding/json"
 	"io/ioutil"
+	"math"
 	"net/http"
 	"sort"
 )
@@ -28,41 +29,49 @@ func (graph *Graph) addEdge(edge Edge) {
 
 // BellmanFord represents a Bellman-Ford struct for use with the algorithm.
 type BellmanFord struct {
-	Graph     Graph
-	Vertices  int
-	Edges     int
-	Distances []float64
-	Cycle     []Edge
+	Graph       Graph
+	Distance    []float64
+	Predecessor []Edge
+}
+
+func (bellmanFord *BellmanFord) initialize(source int) {
+	for i := 0; i < bellmanFord.Graph.Vertices; i++ {
+		bellmanFord.Distance[i] = math.Inf(+1)
+		bellmanFord.Predecessor[i] = Edge{}
+	}
+	bellmanFord.Distance[source] = 0
 }
 
 func (bellmanFord *BellmanFord) relax() {
-	for i := 1; i <= bellmanFord.Vertices-1; i++ {
-		for j := 0; j < bellmanFord.Edges; j++ {
+	for i := 1; i <= bellmanFord.Graph.Vertices-1; i++ {
+		for j := 0; j < bellmanFord.Graph.Edges; j++ {
 			u := bellmanFord.Graph.Adjacency[j].Start
 			v := bellmanFord.Graph.Adjacency[j].Destination
-
 			weight := bellmanFord.Graph.Adjacency[j].Weight
 
-			if bellmanFord.Distances[u]+weight < bellmanFord.Distances[v] {
-				bellmanFord.Distances[v] = bellmanFord.Distances[u] + weight
+			if bellmanFord.Distance[u]+weight < bellmanFord.Distance[v] {
+				bellmanFord.Distance[v] = bellmanFord.Distance[u] + weight
+				bellmanFord.Predecessor[v] = bellmanFord.Adjacency[j]
 			}
-
 		}
 	}
 }
 
 func (bellmanFord *BellmanFord) hasNegativeCycle() bool {
-	flag := false
-	for i := 0; i < bellmanFord.Edges; i++ {
-		u := bellmanFord.Graph.Adjacency[i].Start
-		v := bellmanFord.Graph.Adjacency[i].Destination
-		weight := bellmanFord.Graph.Adjacency[i].Weight
-		if bellmanFord.Distances[u]+weight < bellmanFord.Distances[v] {
-			bellmanFord.Cycle = append(bellmanFord.Cycle, bellmanFord.Graph.Adjacency[i])
-			flag = true
+	for j := 0; j < bellmanFord.Graph.Edges; j++ {
+		u := bellmanFord.Graph.Adjacency[j].Start
+		v := bellmanFord.Graph.Adjacency[j].Destination
+		weight := bellmanFord.Graph.Adjacency[j].Weight
+
+		if bellmanFord.Distance[u]+weight < bellmanFord.Distance[v] {
+			return true
 		}
 	}
-	return flag
+	return false
+}
+
+func (bellmanFord *BellmanFord) retraceNegativeCycle(predecessor []Edge, source int) []Edge {
+	return make([]Edge, 1) // Stub
 }
 
 func createTable() map[string]map[string]float64 {

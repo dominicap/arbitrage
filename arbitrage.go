@@ -50,21 +50,13 @@ func Arbitrage(value float64, code string) []string {
 		}
 	}
 
-	bellmanFord := BellmanFord{Graph: graph, Vertices: graph.Vertices, Edges: graph.Edges, Distances: make([]float64, graph.Vertices)}
+	bellmanFord := BellmanFord{Graph: graph, Distance: make([]float64, graph.Vertices), Predecessor: make([]Edge, graph.Vertices)}
 
-	for i := 0; i < bellmanFord.Vertices; i++ {
-		bellmanFord.Distances[i] = math.Inf(+1)
-	}
-
-	bellmanFord.Distances[source] = 0
-
+	bellmanFord.initialize(source)
 	bellmanFord.relax()
 
 	if bellmanFord.hasNegativeCycle() {
-		for i := 0; i < len(bellmanFord.Cycle); i++ {
-			rate := table[codes[bellmanFord.Cycle[i].Start]][codes[bellmanFord.Cycle[i].Destination]]
-			fmt.Println(codes[bellmanFord.Cycle[i].Start], codes[bellmanFord.Cycle[i].Destination], rate)
-		}
+		// Retrace and get path
 	}
 
 	return nil
